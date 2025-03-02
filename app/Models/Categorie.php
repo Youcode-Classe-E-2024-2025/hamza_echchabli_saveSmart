@@ -13,11 +13,11 @@ class Categorie extends Model
 
     protected $fillable = ['title', 'user_id'];
 
-    public function expenses(){
+    public function transactions(){
 
 
 
-        return $this->hasMany(Expense::class, 'categorie_id');
+        return $this->hasMany(Transaction::class, 'categorie_id');
 
 
 

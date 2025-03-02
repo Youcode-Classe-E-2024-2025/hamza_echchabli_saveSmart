@@ -10,7 +10,7 @@
         @if($profiles) 
             @foreach($profiles as $profile)
                 <div class="text-center">
-                    <a href="{{ route('dashboard') }}" class="block">
+                    <a href="/dashboard/{{$profile->id}}" class="block">
                         <img src="{{ $profile->avatar ? asset('storage/' . $profile->avatar) : 'https://www.w3schools.com/w3images/avatar2.png' }}" 
                              alt="{{ $profile->name }}" 
                              class="w-32 h-32 rounded-full border-4 border-gray-600 hover:border-white">

@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Expense extends Model
+class Transaction extends Model
 {
-    protected $table = 'expenses';
+    protected $table = 'transactions';
 
-    protected $fillable = ['title', 'amount', 'profile_id', 'categorie_id'];
+    protected $fillable = ['title', 'amount', 'profile_id', 'categorie_id', 'type'];
 
     public function profile()
     {

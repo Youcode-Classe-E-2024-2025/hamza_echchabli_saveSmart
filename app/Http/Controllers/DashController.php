@@ -1,15 +1,140 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Categorie;
+use App\Models\Transaction;
+use App\Models\Profile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashController extends Controller
 {
     // Show Dashboard
-    public function index()
+    public function index(Request $request, $id)
     {
-        return view('Userdashboard.dashboard');
+        // Store the selected profile ID in the session
+        session(['profile_id' => $id]);
+        $proId=$id ;
+    
+        // Get the authenticated user ID
+        $userId = Auth::id();
+    
+        // Ensure the selected profile belongs to the user
+        $profile = Profile::where('id', $id)->where('user_id', $userId)->first();
+        if (!$profile) {
+            return redirect()->route('dashboard', ['id' => session('profile_id')])
+                ->withErrors(['profile' => 'Invalid profile selected.']);
+        }
+    
+        // Get all profile IDs that belong to this user
+        $profileIds = Profile::where('user_id', $userId)->pluck('id');
+    
+        // Fetch categories for this user
+        $categories = Categorie::where('user_id', $userId)->get();
+    
+        // Fetch transactions
+        $transactions = Transaction::whereIn('profile_id', $profileIds)
+            ->with('profile', 'categorie')
+            ->orderBy('created_at', 'desc')
+            ->get();
+    
+        // **Calculate Total Balance, Income, and Expenses**
+        $totalIncome = $transactions->where('type', 'revenue')->sum('amount');
+        $totalExpenses = $transactions->where('type', 'expense')->sum('amount');
+        $totalBalance = $totalIncome - $totalExpenses;
+    
+        return view('Userdashboard.dashboard', compact('categories', 'transactions', 'totalBalance', 'totalIncome', 'totalExpenses', 'proId'));
+    }
+    
+    // Store a new category
+    public function storeCategory(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
+        
+        Categorie::create([
+            'title' => $validated['title'],
+            'user_id' => Auth::id(),
+        ]);
+        $profileId = session('profile_id');
+        
+        return redirect('dashboard/'.$profileId)->with('success', 'Category added successfully!');
     }
 
+    // Delete a category
+    public function DeleteCategory($id)
+    {
+        $userId = Auth::id();
+        $category = Categorie::where('id', $id)->where('user_id', $userId)->first();
+
+        if (!$category) {
+            return redirect()->route('dashboard')
+                ->withErrors(['category' => 'Category not found or does not belong to you.']);
+        }
+
+        if ($category->expenses()->count() > 0) {
+            return redirect()->route('dashboard')
+                ->withErrors(['category' => 'Cannot delete category. It has associated expenses.']);
+        }
+
+        $category->delete();
+
+        return redirect()->route('dashboard')->with('success', 'Category deleted successfully!');
+    }
+
+    // Store a new expense
+    public function storeTransaction(Request $request)
+    {
+
+        
+        $profileId = session('profile_id');
+        // Validate the request
+        $validated = $request->validate([
+            'title' => 'nullable|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'categorie_id' => 'required|exists:categories,id',
+            'type' => 'required|in:revenue,expense', // Ensure type is either revenue or expense
+        ]);
+    
+        // Get the authenticated user
+        $user = Auth::user();
+    
+        if (!$user) {
+            
+            return redirect('dashboard/'.$profileId)->withErrors(['user' => 'User not found.']);
+        }
+    
+       
+       
+        if ($validated['type'] === 'expense') {
+        //    return 444;
+            if ($user->balance < $validated['amount']) {
+               
+                return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient balance.']);
+            }
+    
+            $user->balance -= $validated['amount']; // Subtract amount from user balance
+        } else {
+            $user->balance += $validated['amount']; // Add amount to user balance
+        }
+    
+        $user->save();
+    
+        $profileId = session('profile_id');
+    
+       
+        // Create the transaction
+         Transaction::create([
+            'title' => $validated['title'],
+            'amount' => $validated['amount'],
+            'categorie_id' => $validated['categorie_id'],
+            'profile_id' => $profileId,
+            'type' => $validated['type'],
+        ]);
+    
+        return redirect('dashboard/'.$profileId)->with('success', 'Transaction added successfully!');
+    }
+    
     
 }

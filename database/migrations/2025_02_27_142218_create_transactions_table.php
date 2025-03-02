@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('expenses', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->string('title')->nullable();
+            $table->enum('type', ['expense', 'revenue'])->default('expense');
             $table->decimal('amount' ,10 ,2);
             $table->foreignId('profile_id')->constrained()->onDelete('cascade');
             $table->foreignId('categorie_id')->constrained();
@@ -26,6 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('expenses');
+        Schema::dropIfExists('transactions');
     }
+
 };

@@ -21,9 +21,9 @@ class Profile extends Model
     }
 
 
-    public function expenses()
+    public function transactions()
     {
-        return $this->hasMany(Expense::class, 'profile_id');
+        return $this->hasMany(Transaction::class, 'profile_id');
     }
 
     
