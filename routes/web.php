@@ -47,13 +47,16 @@ Route::middleware(['auth'])->group(function () {
 
 
 Route::get('/dashboard/{id}/edit', [DashController::class, 'edit'])->name('transactions.edit');
+
 Route::post('/dashboard/update', [DashController::class, 'update'])->name('dashboard.update');
 
+Route::get('/stat', [DashController::class, 'stat']);
 
 
 
-// Route::get('/dashboard', [DashController::class, 'index'])->name('dashboard');
+
 Route::post('/dashboard/category', [DashController::class, 'storeCategory'])->name('categories.store');
+
 Route::post('/dashboard/Transaction', [DashController::class, 'storeTransaction'])->name('Transaction.store');
 
 

@@ -50,6 +50,41 @@ class DashController extends Controller
     
         return view('Userdashboard.dashboard', compact('categories', 'transactions', 'totalBalance', 'totalIncome', 'totalExpenses', 'proId', 'bala'));
     }
+
+
+    public function stat()
+    {
+    
+        $user = Auth::id();
+
+        // return $user ;
+        // Fetch all profiles for the user
+        $profiles = Profile::where('user_id', $user)->get();
+        // return $profiles;
+
+        // Prepare data for the charts
+        $expensesData = [];
+        $incomesData = [];
+
+        foreach ($profiles as $profile) {
+            // Calculate total expenses for the profile
+            $expensesData[$profile->name] = Transaction::where('profile_id', $profile->id)
+                ->where('type', 'expense')
+                ->sum('amount');
+
+            // Calculate total incomes for the profile
+            $incomesData[$profile->name] = Transaction::where('profile_id', $profile->id)
+                ->where('type', 'revenue')
+                ->sum('amount');
+        }
+
+        // Pass data to the view
+        return view('Userdashboard.stats', [
+            'profiles' => $profiles,
+            'expensesData' => $expensesData,
+            'incomesData' => $incomesData,
+        ]);
+    }
     
     // Store a new category
     public function storeCategory(Request $request)
