@@ -10,7 +10,9 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->string('avatar');
+            $table->string('avatar')->nullable();
+            $table->tinyInteger('active')->default(0); // 0 = active, 1 = not active
+            $table->tinyInteger('archive')->default(1); // 0 = archive, 1 = not archive
             $table->timestamps();
         });
     }

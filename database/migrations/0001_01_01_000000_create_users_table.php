@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->decimal('balance', 10, 2)->nullable();
+            $table->decimal('monthly_income', 10, 2);
             $table->rememberToken();
             $table->timestamps();
         });

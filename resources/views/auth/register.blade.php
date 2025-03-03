@@ -33,6 +33,11 @@
                     <label for="password_confirmation" class="block text-sm font-semibold">Confirm Password</label>
                     <input type="password" name="password_confirmation" id="password_confirmation" class="w-full p-3 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                 </div>
+                <div class="mb-6">
+                    <label for="monthly_income" class="block text-sm font-semibold">Monthly Income</label>
+                    <input type="number" name="monthly_income" id="monthly_income" class="w-full p-3 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required step="0.01">
+                </div>
+                
 
                 <!-- Submit Button -->
                 <button type="submit" class="w-full p-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition duration-300">

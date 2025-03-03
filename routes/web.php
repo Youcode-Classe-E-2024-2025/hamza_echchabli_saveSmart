@@ -39,10 +39,25 @@ Route::middleware(['auth'])->group(function () {
     // Route::post('/profiles/login', [ProfileController::class, 'login'])->name('profiles.login');
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/manage/activate/{id}', [DashController::class, 'activate'])->name('profiles.activate');
+    Route::get('/manage/deactivate/{id}', [DashController::class, 'deactivate'])->name('profiles.deactivate');
+    Route::get('/manage/archive/{id}', [DashController::class, 'archive'])->name('profiles.archive');
+});
+
+
+Route::get('/dashboard/{id}/edit', [DashController::class, 'edit'])->name('transactions.edit');
+Route::post('/dashboard/update', [DashController::class, 'update'])->name('dashboard.update');
+
+
+
 
 // Route::get('/dashboard', [DashController::class, 'index'])->name('dashboard');
 Route::post('/dashboard/category', [DashController::class, 'storeCategory'])->name('categories.store');
 Route::post('/dashboard/Transaction', [DashController::class, 'storeTransaction'])->name('Transaction.store');
+
+
+Route::get('/manage', [DashController::class, 'manage'])->name('profiles.manage');
 
 Route::post('/dashboard/category/delete/{id}', [DashController::class, 'DeleteCategory']);
 

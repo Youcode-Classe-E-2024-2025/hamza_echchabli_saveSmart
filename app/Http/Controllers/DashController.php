@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Categorie;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Models\Profile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,9 @@ class DashController extends Controller
     
         // Get the authenticated user ID
         $userId = Auth::id();
+        $U = User::where('id', $userId)->first();
+        $bala=$U->monthly_income;
+     
     
         // Ensure the selected profile belongs to the user
         $profile = Profile::where('id', $id)->where('user_id', $userId)->first();
@@ -39,11 +43,12 @@ class DashController extends Controller
             ->get();
     
         // **Calculate Total Balance, Income, and Expenses**
-        $totalIncome = $transactions->where('type', 'revenue')->sum('amount');
+        $totalIncome = $bala + $transactions->where('type', 'revenue')->sum('amount');
         $totalExpenses = $transactions->where('type', 'expense')->sum('amount');
         $totalBalance = $totalIncome - $totalExpenses;
+
     
-        return view('Userdashboard.dashboard', compact('categories', 'transactions', 'totalBalance', 'totalIncome', 'totalExpenses', 'proId'));
+        return view('Userdashboard.dashboard', compact('categories', 'transactions', 'totalBalance', 'totalIncome', 'totalExpenses', 'proId', 'bala'));
     }
     
     // Store a new category
@@ -114,9 +119,9 @@ class DashController extends Controller
                 return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient balance.']);
             }
     
-            $user->balance -= $validated['amount']; // Subtract amount from user balance
+            $user->balance -= $validated['amount']; 
         } else {
-            $user->balance += $validated['amount']; // Add amount to user balance
+            $user->balance += $validated['amount']; 
         }
     
         $user->save();
@@ -135,6 +140,101 @@ class DashController extends Controller
     
         return redirect('dashboard/'.$profileId)->with('success', 'Transaction added successfully!');
     }
+
+
+
+    public function manage()
+{
+    $userId = Auth::id();
+    $proId = session('profile_id');
     
-    
+    // Get all profiles that belong to this user with transaction count
+    $profiles = Profile::where('user_id', $userId)
+        ->withCount('transactions') // Assuming the Profile model has a `transactions` relation
+        ->where('archive' ,1)
+        ->get();
+  
+        
+
+        // return $profiles ;
+        
+
+    return view('Userdashboard.manageProfiles', compact('profiles' , 'proId'));
+}
+
+public function activate($id)
+{
+    $profile = Profile::findOrFail($id);
+
+    $profile->update([
+        'active' => 0, // Deactivate the profile
+    ]);
+
+    return redirect()->route('profiles.manage'); // Redirect back to the manage page
+}
+
+public function deactivate($id)
+{
+    $profile = Profile::findOrFail($id);
+
+    $profile->update([
+        'active' => 1, // Activate the profile
+    ]);
+
+    return redirect()->route('profiles.manage'); // Redirect back to the manage page
+}
+
+public function archive($id)
+{
+    $profile = Profile::findOrFail($id);
+
+    $profile->update([
+        'archive' => 0, // Archive the profile
+    ]);
+
+    return redirect()->route('profiles.manage'); // Redirect back to the manage page
+}
+
+
+
+
+public function edit($id)
+{
+    $transaction = Transaction::findOrFail($id);
+    $categories = Category::all(); // Assuming you want to show all categories
+    return view('transactions.edit', compact('transaction', 'categories'));
+}
+
+
+public function update(Request $request)
+{
+    // return $request;
+    $transaction = Transaction::findOrFail($request->id);
+    // return $transaction;
+    $transaction->update([
+        'title' => $request->input('title'),
+        'amount' => $request->input('amount'),
+        'type' => $request->input('type'),
+        'categorie_id' => $request->input('categorie_id'),
+    ]);
+
+    $pid =session('profile_id');
+
+    return redirect('/dashboard/'.$pid);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

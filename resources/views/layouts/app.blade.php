@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-900 text-white">
     <!-- Navbar or header section, if any -->
@@ -16,7 +17,7 @@
     
 
     <!-- Main content goes here -->
-    <div class="container mx-auto p-4">
+    <div class="container mx-auto p-4 ">
         @yield('content')  <!-- Content from child views will be injected here -->
     </div>
 

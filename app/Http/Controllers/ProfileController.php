@@ -16,7 +16,8 @@ class ProfileController extends Controller
 
     public function index()
 {
-    $profiles = Auth::user()->profiles;
+    $profiles = Auth::user()->profiles()->where('archive', 1)->get();
+
     return view('profiles.all', compact('profiles'));
 }
 
@@ -40,7 +41,7 @@ if ($request->hasFile('avatar')) {
 
     // Get the authenticated user's ID
     $userId = auth()->user()->id;
-
+    // return $userId ;
     // Create the profile with the user_id
     $profile = Profile::create([
         'user_id' => $userId,  // Add the user_id
