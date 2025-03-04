@@ -38,100 +38,108 @@
     </div>
 
     <!-- Main content area -->
-    <div class="flex-grow md:ml-52 p-6">
-        <h1 class="my-4 text-2xl font-bold">Expenses and Incomes by Profile</h1>
-        <div class="row">
-            <div class="col-md-6">
-                <h3>Expenses</h3>
+    <div class="bg-white w-11/12 h-fit-content md:w-7/10 rounded-lg md:ml-52 p-6  mx-auto">
+        <div class="bg-blue-100 flex-grow md:w-7/10 rounded-lg  ">
+        <h1 class="my-4 text-black text-2xl font-bold">Expenses and Incomes by Profile</h1>
+        <div class="flex justify-evenly">
+            <div class="w-full md:w-1/3">
+                <h3 class="text-center text-black">Expenses</h3>
                 <canvas id="expensesChart"></canvas>
             </div>
-            <div class="col-md-6">
-                <h3>Incomes</h3>
+            <div class="w-full md:w-1/3">
+                <h3 class="text-center text-black">Incomes</h3>
                 <canvas id="incomesChart"></canvas>
-            </div>
+            </div> 
         </div>
-    </div>
-</div>
 
+    </div>
+
+    </div>
+    
+    
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const profiles = @json($profiles->pluck('name'));
-        const expensesData = @json(array_values($expensesData));
-        const incomesData = @json(array_values($incomesData));
+  document.addEventListener('DOMContentLoaded', function () {
+    const profiles = @json($profiles->pluck('name'));
+    const expensesData = @json(array_values($expensesData));
+    const incomesData = @json(array_values($incomesData));
+  
 
-        // Generate random colors for each profile
-        const generateColors = (count) => {
-            const colors = [];
-            for (let i = 0; i < count; i++) {
-                colors.push(`rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`);
-            }
-            return colors;
-        };
+    const generateColors = (count) => {
+        const colors = [];
+        for (let i = 0; i < count; i++) {
+            colors.push(`rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`);
+        }
+        return colors;
+    };
 
-        const profileColors = generateColors(profiles.length);
+    const profileColors = generateColors(profiles.length);
 
-        // Expenses Chart
-        const expensesCtx = document.getElementById('expensesChart').getContext('2d');
-        new Chart(expensesCtx, {
-            type: 'doughnut',
-            data: {
-                labels: profiles,
-                datasets: [{
-                    label: 'Expenses',
-                    data: expensesData,
-                    backgroundColor: profileColors,
-                    borderColor: profileColors.map(color => color.replace('0.6', '1')),
-                    borderWidth: 1,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return `${context.label}: $${context.raw}`;
-                            }
+    // Expenses Chart
+    const expensesCtx = document.getElementById('expensesChart').getContext('2d');
+    new Chart(expensesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: profiles,
+            datasets: [{
+                label: 'Expenses',
+                data: expensesData,
+                backgroundColor: profileColors,
+                borderColor: profileColors.map(color => color.replace('0.6', '1')),
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.label}: $${context.raw}`;
                         }
                     }
                 }
             }
-        });
-
-        // Incomes Chart
-        const incomesCtx = document.getElementById('incomesChart').getContext('2d');
-        new Chart(incomesCtx, {
-            type: 'doughnut',
-            data: {
-                labels: profiles,
-                datasets: [{
-                    label: 'Incomes',
-                    data: incomesData,
-                    backgroundColor: profileColors,
-                    borderColor: profileColors.map(color => color.replace('0.6', '1')),
-                    borderWidth: 1,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return `${context.label}: $${context.raw}`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        }
     });
+
+    // Incomes Chart
+    const incomesCtx = document.getElementById('incomesChart').getContext('2d');
+    new Chart(incomesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: profiles,
+            datasets: [{
+                label: 'Incomes',
+                data: incomesData,
+                backgroundColor: profileColors,
+                borderColor: profileColors.map(color => color.replace('0.6', '1')),
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.label}: $${context.raw}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Balance Chart (Monthly vs Normal Income)
+   
+});
+
 </script>
 @endsection

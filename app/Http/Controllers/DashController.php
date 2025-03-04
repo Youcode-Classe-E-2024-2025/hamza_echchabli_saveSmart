@@ -53,40 +53,40 @@ class DashController extends Controller
 
 
     public function stat()
-    {
-    
-        $user = Auth::id();
-        session(['profile_id' => $id]);
-        $proId=$id ;
+{
 
-        // return $user ;
+   dd(app('cache'));
+
+    $user = Auth::id();
+    $proId = session('profile_id');
+
+    $profiles = Profile::where('user_id', $user)->get();
+
+    $expensesData = [];
+    $incomesData = [];
+
+    foreach ($profiles as $profile) {
+
+        $expensesData[$profile->name] = Transaction::where('profile_id', $profile->id)
+            ->where('type', 'expense')
+            ->sum('amount');
+
+        $incomesData[$profile->name] = Transaction::where('profile_id', $profile->id)
+            ->where('type', 'revenue')
+            ->sum('amount');
+
        
-        $profiles = Profile::where('user_id', $user)->get();
-        // return $profiles;
 
-        $expensesData = [];
-        $incomesData = [];
-
-        foreach ($profiles as $profile) {
-            
-            $expensesData[$profile->name] = Transaction::where('profile_id', $profile->id)
-                ->where('type', 'expense')
-                ->sum('amount');
-
-                
-            $incomesData[$profile->name] = Transaction::where('profile_id', $profile->id)
-                ->where('type', 'revenue')
-                ->sum('amount');
-        }
-
-        
-        return view('Userdashboard.stats', [
-            'profiles' => $profiles,
-            'expensesData' => $expensesData,
-            'incomesData' => $incomesData,
-        ]);
     }
-    
+
+    return view('Userdashboard.stats', [
+        'profiles' => $profiles,
+        'expensesData' => $expensesData,
+        'incomesData' => $incomesData,
+        'proId' => $proId,
+    ]);
+}
+
     // Store a new category
     public function storeCategory(Request $request)
     {
