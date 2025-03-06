@@ -8,12 +8,7 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-    // public function index()
-    // {
-    //     $profiles = Auth::user()->profiles;
-    //     return view('profiles.all', compact('profiles'));
-    // }
-
+   
     public function index()
 {
     $profiles = Auth::user()->profiles()->where('archive', 1)->get();
@@ -32,25 +27,25 @@ public function store(Request $request)
 
     // return $request ;
 
-    // Save avatar
     $avatarPath = null;
 if ($request->hasFile('avatar')) {
-    // Store the avatar in the 'avatars' folder within the 'public' disk
-    $avatarPath = $request->file('avatar')->store('avatars', 'public'); // Correct storage path
+    
+    $avatarPath = $request->file('avatar')->store('avatars', 'public'); 
 }
 
-    // Get the authenticated user's ID
+
     $userId = auth()->user()->id;
     // return $userId ;
-    // Create the profile with the user_id
+
     $profile = Profile::create([
-        'user_id' => $userId,  // Add the user_id
+        'user_id' => $userId, 
         'name' => $request->name,
-        'avatar' => $avatarPath, // Save the image path to the database
+        'avatar' => $avatarPath, 
+        
     ]);
 
     return redirect('/profiles');
-    // Redirect to the profile list page
+   
 }
 
 
@@ -80,4 +75,6 @@ if ($request->hasFile('avatar')) {
 //         // // If password is incorrect, return back with an error
 //         // return back()->withErrors(['password' => 'Incorrect password.']);
 //     }
+
+
 }

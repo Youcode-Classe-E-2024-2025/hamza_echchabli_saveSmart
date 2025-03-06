@@ -16,7 +16,6 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    // Handle Login Request
     public function login(Request $request)
     {
         $request->validate([
@@ -25,7 +24,7 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {
-            return redirect()->intended('/dashboard');  // Redirect to the dashboard or home page
+            return redirect()->intended('/dashboard'); 
         }
 
         return back()->withErrors([
@@ -33,20 +32,18 @@ class AuthController extends Controller
         ]);
     }
 
-    // Handle Logout Request
+
     public function logout()
     {
         Auth::logout();
         return redirect('/login');
     }
 
-    // Show Registration Form
     public function showRegistrationForm()
     {
         return view('auth.register');
     }
 
-    // Handle Registration Request
     public function register(Request $request)
     {
 
@@ -66,17 +63,17 @@ class AuthController extends Controller
           
         ]);
     
-        // event(new Registered($user));
-        Auth::login($user);
+       
     
-        // Create Default Profile
         Profile::create([
             'user_id' => $user->id,
             'name' => $user->name,
             'password' => Hash::make('defaultpassword'),
             'avatar' => '',
         ]);
-    
+        
+          Auth::login($user);
+
         return redirect('/profiles');
     }
 }

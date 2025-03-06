@@ -55,7 +55,7 @@ class DashController extends Controller
     public function stat()
 {
 
-   dd(app('cache'));
+   
 
     $user = Auth::id();
     $proId = session('profile_id');
