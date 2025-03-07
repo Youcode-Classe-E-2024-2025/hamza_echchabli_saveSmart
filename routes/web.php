@@ -6,6 +6,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthController;
 
+use App\Http\Controllers\GoalController;
+
 
 Route::get('/', [HomeController::class, 'index']);
 
@@ -78,7 +80,8 @@ Route::get('/typescategorie/{type}', [DashController::class, 'returnCategories']
 //     return response()->json(['categories' => $categories]);
 // });
 
-
+    Route::get('/goals', [DashController::class, 'Goals'])->name('goals.Goals');
+    Route::post('/goals', [DashController::class, 'store'])->name('goals.store');
 
 
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Categorie;
 use App\Models\Transaction;
 use App\Models\User;
+
+use App\Models\Goal;
 use App\Models\Type;
 use App\Models\Profile;
 use Illuminate\Http\Request;
@@ -45,11 +47,21 @@ class DashController extends Controller
             ->get();
     
 
+            $expenseTypes = [2, 3, 4];
+$transactionsSum = Transaction::whereIn('profile_id', $profileIds)
+    ->whereIn('type_id', $expenseTypes)
+    ->with('profile', 'categorie')
+    ->orderBy('created_at', 'desc')
+    ->get();
+
+
+    $totalExpenses = $transactionsSum->sum('amount');
+
             $user = Auth::user();
 
 $totalIncome = $user->balance->needs + $user->balance->wants + $user->balance->saves;
 
-$totalExpenses = $user->balance->needs + $user->balance->wants;
+// $totalExpenses = $user->balance->needs + $user->balance->wants;
 
 $totalBalance = $totalIncome - $totalExpenses;
 
@@ -403,7 +415,30 @@ public function update(Request $request)
 
 
 
+public function Goals()
+{
+    $goals = auth()->user()->goals;
+    return view('goals.goalsView', compact('goals'));
+}
 
+
+
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'target_amount' => 'required|numeric|min:0',
+    ]);
+
+    Goal::create([
+        'title' => $validated['title'],
+        'target_amount' => $validated['target_amount'],
+        'user_id' => auth()->id(),
+        'current_amount' => 0,
+    ]);
+
+    return redirect()->route('goals.index')->with('success', 'Goal created successfully.');
+}
 
 
 
