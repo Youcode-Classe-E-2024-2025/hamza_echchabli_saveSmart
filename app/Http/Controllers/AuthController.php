@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Profile;
 
+use App\Models\Balance;
+
 class AuthController extends Controller
 {
     // Show Login Form
@@ -44,36 +46,86 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    public function register(Request $request)
-    {
+    // public function register(Request $request)
+    // {
 
-        // return $request;
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+    //     // return $request;
+    //     $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'email' => 'required|string|email|max:255|unique:users',
+    //         'password' => 'required|string|min:8|confirmed',
+    //     ]);
     
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'monthly_income'=> $request->monthly_income,
-            'balance'=>$request->monthly_income,
+    //     $user = User::create([
+    //         'name' => $request->name,
+    //         'email' => $request->email,
+    //         'password' => Hash::make($request->password),
+    //         'monthly_income'=> $request->monthly_income,
+    //         'balance'=>$request->monthly_income,
           
-        ]);
+    //     ]);
     
        
     
-        Profile::create([
-            'user_id' => $user->id,
-            'name' => $user->name,
-            'password' => Hash::make('defaultpassword'),
-            'avatar' => '',
-        ]);
+    //     Profile::create([
+    //         'user_id' => $user->id,
+    //         'name' => $user->name,
+    //         'password' => Hash::make('defaultpassword'),
+    //         'avatar' => '',
+    //     ]);
         
-          Auth::login($user);
+    //       Auth::login($user);
 
-        return redirect('/profiles');
-    }
+    //     return redirect('/profiles');
+    // }
+
+
+
+public function register(Request $request)
+{
+
+    
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8|confirmed',
+        'monthly_income' => 'required|numeric|min:0',
+    ]);
+
+    
+
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'monthly_income' => $request->monthly_income, // Keep monthly income
+    ]);
+
+
+    
+
+    // Distribute balance (50% Needs, 30% Wants, 20% Savings)
+    $b =Balance::create([
+        'user_id' => $user->id,
+        'needs' => $request->monthly_income * 0.50,
+        'wants' => $request->monthly_income * 0.30,
+        'savings' => $request->monthly_income * 0.20,
+    ]);
+
+    // return $b;
+
+    Profile::create([
+        'user_id' => $user->id,
+        'name' => $user->name,
+        'password' => Hash::make('defaultpassword'),
+        'avatar' => '',
+    ]);
+
+    Auth::login($user);
+
+    return redirect('/profiles');
+}
+
+
+
 }

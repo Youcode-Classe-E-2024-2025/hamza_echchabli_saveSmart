@@ -11,7 +11,8 @@ class Categorie extends Model
 
     protected $table = 'categories';
 
-    protected $fillable = ['title', 'user_id'];
+    protected $fillable = ['title', 'type_id', 'user_id'];
+
 
     public function transactions(){
 
@@ -24,12 +25,15 @@ class Categorie extends Model
 
     } 
 
+    public function type()
+    {
+        return $this->belongsTo(Type::class, 'type_id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-    
-
 
 
 
