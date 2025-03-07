@@ -38,12 +38,10 @@
             </nav>
         </div>
 
-        <!-- Main Content - adjusted margin to match narrower sidebar -->
         <div class="w-full md:ml-52 flex-1 p-3 transition-all duration-300">
-            <!-- Balance Summary Section - made more compact -->
             <div class="bg-white rounded-lg shadow-md p-4 mb-4">
                 <h1 class="text-xl font-bold mb-3 text-gray-800">Financial Dashboard</h1>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div class="bg-blue-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
                         <h3 class="text-base font-medium text-gray-700">Total Balance</h3>
                         <p class="text-2xl font-bold {{ $totalBalance >= 0 ? 'text-green-600' : 'text-red-600' }}">
@@ -63,13 +61,19 @@
                         <h3 class="text-base font-medium text-gray-700">Monthly Income</h3>
                         <p class="text-2xl font-bold text-black">${{ number_format($bala, 2) }}</p>
                     </div>
+                    <div class="bg-red-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <h3 class="text-base font-medium text-gray-700">Needs Amount</h3>
+                        <p class="text-2xl font-bold text-black">${{ number_format($needs, 2) }}</p>
+                    </div>
+                    <div class="bg-red-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <h3 class="text-base font-medium text-gray-700">Wants Amount</h3>
+                        <p class="text-2xl font-bold text-black">${{ number_format($wants, 2) }}</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Forms and Lists Section - reduced gap and padding -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="space-y-4">
-                    <!-- Category Form -->
                     <div class="bg-white rounded-lg shadow-md p-4">
                         <h2 class="text-lg font-bold mb-3 text-gray-800 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -84,14 +88,26 @@
                                     <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Category Title</label>
                                     <input type="text" name="title" id="title" class="w-full px-3 py-1.5 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-300 transition duration-200" required>
                                 </div>
+                        
+                                <!-- Type Selection Dropdown -->
+                                <div class="mb-3">
+                                    <label for="type_id" class="block text-sm font-medium text-gray-700 mb-1">Category Type</label>
+                                    <select name="type_id" id="type_id" class="w-full px-3 py-1.5 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-300 transition duration-200" required>
+                                        <option value="1">income</option>
+                                        <option value="2">needs</option>
+                                        <option value="3">wants</option>
+                                    </select>
+                                </div>
+                        
                                 <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-1.5 px-4 rounded-md transition duration-200 flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m0-6H6" />
                                     </svg>
                                     Create Category
                                 </button>
                             </form>
                         </div>
+                        
                     </div>
 
                     <!-- Categories List -->
@@ -132,6 +148,18 @@
                             </svg>
                             Add New Transaction
                         </h2>
+                        <h3>
+                            @if ($errors->any())
+    <div class="text-red-500">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+                        </h3>
                         <div class="expense_form_container">
                             <form action="/dashboard/Transaction" method="POST">
                                 @csrf
@@ -147,19 +175,21 @@
                     
                                 <div class="mb-3">
                                     <label for="type" class="block text-sm font-medium text-gray-700 mb-1">Transaction Type</label>
-                                    <select name="type" id="type" class="w-full px-3 py-1.5 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-300 transition duration-200" required>
-                                        <option value="expense">Expense</option>
-                                        <option value="revenue">Revenue</option>
+                                    <select name="type_id" id="type" class="w-full px-3 py-1.5 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-300 transition duration-200" required>
+                                        <option value="">Select a category</option>
+                                        <option value="1">income</option>
+                                        <option value="2">needs</option>
+                                        <option value="3">wants</option>
                                     </select>
                                 </div>
                     
                                 <div class="mb-3">
                                     <label for="categorie_id" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                                    <select name="categorie_id" id="categorie_id" class="w-full px-3 py-1.5 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-300 transition duration-200" required>
+                                    <select name="categorie_id" id="categorieDropDpwn" class="w-full px-3 py-1.5 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-300 transition duration-200" required>
                                         <option value="">Select a category</option>
-                                        @foreach($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->title }}</option>
-                                        @endforeach
+                                      
+                                            
+                                      
                                     </select>
                                 </div>
                     
@@ -241,8 +271,8 @@
                                     <div class="mb-3">
                                         <label for="type" class="block text-black text-sm font-medium text-gray-700">Type</label>
                                         <select name="type" id="type" class="mt-1 block text-black w-full py-1.5 border border-gray-300 rounded-md shadow-sm" required>
-                                            <option value="revenue">Income</option>
-                                            <option value="expense">Expense</option>
+                                            <option value="1">Income</option>
+                                            <option value="2">Expense</option>
                                         </select>
                                     </div>
                         
@@ -263,9 +293,15 @@
                             </div>
                         </div>
                         
-                        <script>
-                            // Open the Edit Modal
-                            function openEditModal(transactionId) {
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    function openEditModal(transactionId) {
                                 // Set the hidden input value to the selected transaction ID
                                 document.getElementById('transaction_id').value = transactionId;
                         
@@ -277,10 +313,32 @@
                             function closeEditModal() {
                                 document.getElementById('editModal').classList.add('hidden');
                             }
-                        </script>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
+document.getElementById("type").addEventListener("change", function() {
+    const type = this.value;
+    
+    console.log(type);
+    
+
+    fetch(`/typescategorie/${type}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            
+            const categorySelect = document.getElementById("categorieDropDpwn");
+            categorySelect.innerHTML = '<option value="">Select a category</option>'; // Reset options
+            
+            // Populate the categories dropdown
+            data.forEach(category => {
+                const option = document.createElement("option");
+                option.value = category.id;
+                option.textContent = category.title;
+                categorySelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error("Error fetching categories:", error));
+});
+
+</script>
+
 @endsection

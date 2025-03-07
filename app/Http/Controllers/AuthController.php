@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Profile;
-
+use App\Models\Categorie;
 use App\Models\Balance;
 
 class AuthController extends Controller
@@ -46,73 +46,75 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    // public function register(Request $request)
-    // {
-
-    //     // return $request;
-    //     $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'email' => 'required|string|email|max:255|unique:users',
-    //         'password' => 'required|string|min:8|confirmed',
-    //     ]);
     
-    //     $user = User::create([
-    //         'name' => $request->name,
-    //         'email' => $request->email,
-    //         'password' => Hash::make($request->password),
-    //         'monthly_income'=> $request->monthly_income,
-    //         'balance'=>$request->monthly_income,
-          
-    //     ]);
+
+
+// public function register(Request $request)
+// {
+
     
-       
+//     $request->validate([
+//         'name' => 'required|string|max:255',
+//         'email' => 'required|string|email|max:255|unique:users',
+//         'password' => 'required|string|min:8|confirmed',
+//         'monthly_income' => 'required|numeric|min:0',
+//     ]);
+
     
-    //     Profile::create([
-    //         'user_id' => $user->id,
-    //         'name' => $user->name,
-    //         'password' => Hash::make('defaultpassword'),
-    //         'avatar' => '',
-    //     ]);
-        
-    //       Auth::login($user);
 
-    //     return redirect('/profiles');
-    // }
+//     $user = User::create([
+//         'name' => $request->name,
+//         'email' => $request->email,
+//         'password' => Hash::make($request->password),
+//         'monthly_income' => $request->monthly_income, // Keep monthly income
+//     ]);
 
 
+    
+
+//     // Distribute balance (50% Needs, 30% Wants, 20% Savings)
+//     $b =Balance::create([
+//         'user_id' => $user->id,
+//         'needs' => $request->monthly_income * 0.50,
+//         'wants' => $request->monthly_income * 0.30,
+//         'savings' => $request->monthly_income * 0.20,
+//     ]);
+
+//     // return $b;
+
+//     Profile::create([
+//         'user_id' => $user->id,
+//         'name' => $user->name,
+//         'password' => Hash::make('defaultpassword'),
+//         'avatar' => '',
+//     ]);
+
+//     Auth::login($user);
+
+//     return redirect('/profiles');
+// }
 
 public function register(Request $request)
 {
-
-    
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',
         'password' => 'required|string|min:8|confirmed',
-        'monthly_income' => 'required|numeric|min:0',
     ]);
-
-    
 
     $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
         'password' => Hash::make($request->password),
-        'monthly_income' => $request->monthly_income, // Keep monthly income
+        'monthly_income' => $request->monthly_income,
     ]);
 
-
-    
-
-    // Distribute balance (50% Needs, 30% Wants, 20% Savings)
-    $b =Balance::create([
-        'user_id' => $user->id,
-        'needs' => $request->monthly_income * 0.50,
-        'wants' => $request->monthly_income * 0.30,
-        'savings' => $request->monthly_income * 0.20,
-    ]);
-
-    // return $b;
+    Balance::create([
+                'user_id' => $user->id,
+                'needs' => $request->monthly_income * 0.50,
+                'wants' => $request->monthly_income * 0.30,
+                'savings' => $request->monthly_income * 0.20,
+            ]);
 
     Profile::create([
         'user_id' => $user->id,
@@ -120,6 +122,17 @@ public function register(Request $request)
         'password' => Hash::make('defaultpassword'),
         'avatar' => '',
     ]);
+
+    
+    $defaultCategories = [
+
+        ['title' => 'rent', 'type_id' => 2, 'user_id' =>  $user->id], // null means available for all
+        ['title' => 'travling', 'type_id' => 3, 'user_id' =>  $user->id],
+        ['title' => 'Freelance', 'type_id' => 1, 'user_id' =>  $user->id],
+       
+    ];
+
+    Categorie::insert($defaultCategories);
 
     Auth::login($user);
 

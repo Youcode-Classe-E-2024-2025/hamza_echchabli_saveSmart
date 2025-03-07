@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Categorie;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Type;
 use App\Models\Profile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,20 +36,26 @@ class DashController extends Controller
     
         // Fetch categories for this user
         $categories = Categorie::where('user_id', $userId)->get();
-    
+        $needs=$U->balance->needs;
+        $wants=$U->balance->wants;
         // Fetch transactions
         $transactions = Transaction::whereIn('profile_id', $profileIds)
             ->with('profile', 'categorie')
             ->orderBy('created_at', 'desc')
             ->get();
     
-        // **Calculate Total Balance, Income, and Expenses**
-        $totalIncome = $bala + $transactions->where('type', 'revenue')->sum('amount');
-        $totalExpenses = $transactions->where('type', 'expense')->sum('amount');
-        $totalBalance = $totalIncome - $totalExpenses;
+
+            $user = Auth::user();
+
+$totalIncome = $user->balance->needs + $user->balance->wants + $user->balance->saves;
+
+$totalExpenses = $user->balance->needs + $user->balance->wants;
+
+$totalBalance = $totalIncome - $totalExpenses;
+
 
     
-        return view('Userdashboard.dashboard', compact('categories', 'transactions', 'totalBalance', 'totalIncome', 'totalExpenses', 'proId', 'bala'));
+        return view('Userdashboard.dashboard', compact('categories', 'transactions', 'totalBalance', 'totalIncome', 'totalExpenses', 'proId', 'bala','needs','wants'));
     }
 
 
@@ -87,21 +94,36 @@ class DashController extends Controller
     ]);
 }
 
-    // Store a new category
+
+public function  returnCategories(int $type)
+{
+  
+        $categories = Categorie::where('type_id', $type)->get();
+  
+
+          return response()->json($categories);
+}
+
+  
+    
     public function storeCategory(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'type_id' => 'required|exists:types,id', // Ensure type_id is valid
         ]);
         
         Categorie::create([
             'title' => $validated['title'],
             'user_id' => Auth::id(),
+            'type_id' => $validated['type_id'], // Assign the selected type_id
         ]);
+    
         $profileId = session('profile_id');
-        
+    
         return redirect('dashboard/'.$profileId)->with('success', 'Category added successfully!');
     }
+    
 
     // Delete a category
     public function DeleteCategory($id)
@@ -124,58 +146,174 @@ class DashController extends Controller
         return redirect()->route('dashboard')->with('success', 'Category deleted successfully!');
     }
 
-    // Store a new expense
-    public function storeTransaction(Request $request)
-    {
+    // // Store a new expense
+    // public function storeTransaction(Request $request)
+    // {
 
         
-        $profileId = session('profile_id');
-        // Validate the request
-        $validated = $request->validate([
-            'title' => 'nullable|string|max:255',
-            'amount' => 'required|numeric|min:0',
-            'categorie_id' => 'required|exists:categories,id',
-            'type' => 'required|in:revenue,expense', // Ensure type is either revenue or expense
-        ]);
+    //     $profileId = session('profile_id');
+    //     // Validate the request
+    //     $validated = $request->validate([
+    // 'title' => 'nullable|string|max:255',
+    // 'amount' => 'required|numeric|min:0',
+    // 'type' => 'required|in:needs,wants,saves,income',
+    // 'categorie_id' => 'required|exists:categories,id', 
+    //  ]);
+
     
-        // Get the authenticated user
-        $user = Auth::user();
+    //     // Get the authenticated user
+    //     $user = Auth::user();
     
-        if (!$user) {
+    //     if (!$user) {
             
-            return redirect('dashboard/'.$profileId)->withErrors(['user' => 'User not found.']);
-        }
+    //         return redirect('dashboard/'.$profileId)->withErrors(['user' => 'User not found.']);
+    //     }
     
        
        
-        if ($validated['type'] === 'expense') {
-        //    return 444;
-            if ($user->balance < $validated['amount']) {
-               
-                return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient balance.']);
-            }
+    //     switch ($validated['type']) {
+    //         case 'needs':
+    //             // Subtract from needs
+    //             $needsAmount = $validated['amount'];
+    //             if ($user->needs < $needsAmount) {
+    //                 return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient needs balance.']);
+    //             }
+    //             $user->needs -= $needsAmount;
+    //             break;
+        
+    //         case 'wants':
+    //             // Subtract from wants
+    //             $wantsAmount = $validated['amount'];
+    //             if ($user->wants < $wantsAmount) {
+    //                 return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient wants balance.']);
+    //             }
+    //             $user->wants -= $wantsAmount;
+    //             break;
+        
+    //         case 'saves':
+    //             // Subtract from savings
+    //             $savesAmount = $validated['amount'];
+    //             if ($user->saves < $savesAmount) {
+    //                 return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient savings balance.']);
+    //             }
+    //             $user->saves -= $savesAmount;
+    //             break;
+        
+    //         case 'income':
+    //             // Add to all categories based on the specified percentages
+    //             $needsAmount = $validated['amount'] * 0.50;
+    //             $wantsAmount = $validated['amount'] * 0.30;
+    //             $savesAmount = $validated['amount'] * 0.20;
+        
+    //             $user->needs += $needsAmount;
+    //             $user->wants += $wantsAmount;
+    //             $user->saves += $savesAmount;
+    //             break;
+    //     }
+        
+    //     $user->save();
+        
     
-            $user->balance -= $validated['amount']; 
-        } else {
-            $user->balance += $validated['amount']; 
-        }
+    //     $user->save();
     
-        $user->save();
-    
-        $profileId = session('profile_id');
+    //     $profileId = session('profile_id');
     
        
-        // Create the transaction
-         Transaction::create([
-            'title' => $validated['title'],
-            'amount' => $validated['amount'],
-            'categorie_id' => $validated['categorie_id'],
-            'profile_id' => $profileId,
-            'type' => $validated['type'],
-        ]);
+    //     // Create the transaction
+    //     Transaction::create([
+    //         'title' => $validated['title'],
+    //         'amount' => $validated['amount'],
+    //         'profile_id' => $profileId,
+    //         'type' => $validated['type'],
+
+    //     ]);
+        
     
-        return redirect('dashboard/'.$profileId)->with('success', 'Transaction added successfully!');
+    //     return redirect('dashboard/'.$profileId)->with('success', 'Transaction added successfully!');
+    // }
+
+    public function storeTransaction(Request $request)
+{
+
+   
+    $profileId = session('profile_id');
+
+    // Validate the request
+     $validated = $request->validate([
+        'title' => 'nullable|string|max:255',
+        'amount' => 'required|numeric|min:0',
+        'type_id' => 'required', // Validate type_id
+        'categorie_id' => '',
+    ]);
+
+    // return $validated;
+
+    // Get the authenticated user
+    $user = Auth::user();
+
+    if (!$user) {
+        return redirect('dashboard/'.$profileId)->withErrors(['user' => 'User not found.']);
     }
+
+    // Process the transaction based on the type_id
+    $type = Type::findOrFail($validated['type_id']);
+    
+    switch ($type->title) {
+        case 'needs':
+            // Subtract from needs
+            $needsAmount = $validated['amount'];
+            if ($user->balance->needs < $needsAmount) {
+                return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient needs balance.']);
+            }
+            $user->balance->needs -= $needsAmount;
+            break;
+    
+        case 'wants':
+            // Subtract from wants
+            $wantsAmount = $validated['amount'];
+            if ($user->balance->wants < $wantsAmount) {
+                return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient wants balance.']);
+            }
+            $user->balance->wants -= $wantsAmount;
+            break;
+    
+        case 'saves':
+            // Subtract from savings
+            $savesAmount = $validated['amount'];
+            if ($user->balance->saves < $savesAmount) {
+                return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient savings balance.']);
+            }
+            $user->balance->saves -= $savesAmount;
+            break;
+    
+        case 'income':
+            // Add to all categories based on the specified percentages
+            $needsAmount = $validated['amount'] * 0.50;
+            $wantsAmount = $validated['amount'] * 0.30;
+            $savesAmount = $validated['amount'] * 0.20;
+    
+            $user->balance->needs += $needsAmount;
+            $user->balance->wants += $wantsAmount;
+            $user->balance->savings += $savesAmount;
+            break;
+    }
+    
+    // Save the updated balance
+    $user->balance->save();
+    
+
+    // Create the transaction
+    Transaction::create([
+        'title' => $validated['title'],
+        'amount' => $validated['amount'],
+        'profile_id' => $profileId,
+        'type_id' => $validated['type_id'],
+        'categorie_id' => $validated['categorie_id'],
+    ]);
+
+    return redirect('dashboard/'.$profileId)->with('success', 'Transaction added successfully!');
+}
+
 
 
 

@@ -8,7 +8,7 @@ class Transaction extends Model
 {
     protected $table = 'transactions';
 
-    protected $fillable = ['title', 'amount', 'profile_id', 'categorie_id', 'type'];
+    protected $fillable = ['title', 'amount', 'profile_id', 'categorie_id', 'type_id'];
 
     public function profile()
     {

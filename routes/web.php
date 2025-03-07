@@ -1,10 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\DashController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
-
 use App\Http\Controllers\AuthController;
+
 
 Route::get('/', [HomeController::class, 'index']);
 
@@ -21,7 +22,6 @@ Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
-use App\Http\Controllers\DashController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/{id}', [DashController::class, 'index'])->name('dashboard');
@@ -31,7 +31,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-use App\Http\Controllers\ProfileController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profiles', [ProfileController::class, 'index']);
@@ -66,6 +65,18 @@ Route::post('/dashboard/category/delete/{id}', [DashController::class, 'DeleteCa
 
 
 
+
+Route::get('/typescategorie/{type}', [DashController::class, 'returnCategories']);
+
+
+// Route::get('/get-categories', function(Request $request) {
+//     $type = $request->type;
+
+//     // Filter categories based on type (expense or revenue)
+//     $categories = Categorie::where('type_id', $type == 'expense' ? 2 : 1)->get();
+
+//     return response()->json(['categories' => $categories]);
+// });
 
 
 
