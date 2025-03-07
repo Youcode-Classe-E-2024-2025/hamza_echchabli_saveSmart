@@ -51,30 +51,6 @@ if ($request->hasFile('avatar')) {
 
    
 
-// public function login(Request $request)
-//     {
-//         return 'test';
-//         // Validate input
-//         $request->validate([
-//             'profile_id' => 'required|exists:profiles,id',
-           
-//         ]);
-
-//         // Retrieve the profile from the database
-//         $profile = Profile::find($request->profile_id);
-//         return $profile;
-//         // Check if the profile exists and the password is correct
-//         // if ($profile) {
-//         //     // Store profile ID in session
-//         //     session(['profile_id' => $profile->id]);
-
-//         //     // Redirect to dashboard or other page
-//         //     return redirect()->route('dashboard'); // Replace with your actual route
-//         // }
-
-//         // // If password is incorrect, return back with an error
-//         // return back()->withErrors(['password' => 'Incorrect password.']);
-//     }
 
 
 }

@@ -49,50 +49,6 @@ class AuthController extends Controller
     
 
 
-// public function register(Request $request)
-// {
-
-    
-//     $request->validate([
-//         'name' => 'required|string|max:255',
-//         'email' => 'required|string|email|max:255|unique:users',
-//         'password' => 'required|string|min:8|confirmed',
-//         'monthly_income' => 'required|numeric|min:0',
-//     ]);
-
-    
-
-//     $user = User::create([
-//         'name' => $request->name,
-//         'email' => $request->email,
-//         'password' => Hash::make($request->password),
-//         'monthly_income' => $request->monthly_income, // Keep monthly income
-//     ]);
-
-
-    
-
-//     // Distribute balance (50% Needs, 30% Wants, 20% Savings)
-//     $b =Balance::create([
-//         'user_id' => $user->id,
-//         'needs' => $request->monthly_income * 0.50,
-//         'wants' => $request->monthly_income * 0.30,
-//         'savings' => $request->monthly_income * 0.20,
-//     ]);
-
-//     // return $b;
-
-//     Profile::create([
-//         'user_id' => $user->id,
-//         'name' => $user->name,
-//         'password' => Hash::make('defaultpassword'),
-//         'avatar' => '',
-//     ]);
-
-//     Auth::login($user);
-
-//     return redirect('/profiles');
-// }
 
 public function register(Request $request)
 {
@@ -126,7 +82,7 @@ public function register(Request $request)
     
     $defaultCategories = [
 
-        ['title' => 'rent', 'type_id' => 2, 'user_id' =>  $user->id], // null means available for all
+        ['title' => 'rent', 'type_id' => 1, 'user_id' =>  $user->id], 
         ['title' => 'travling', 'type_id' => 3, 'user_id' =>  $user->id],
         ['title' => 'Freelance', 'type_id' => 1, 'user_id' =>  $user->id],
         ['title' => 'goal', 'type_id' => 4, 'user_id' =>  $user->id],

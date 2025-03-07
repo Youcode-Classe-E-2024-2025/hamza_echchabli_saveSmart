@@ -61,50 +61,12 @@ $transactionsSum = Transaction::whereIn('profile_id', $profileIds)
 
 $totalIncome = $user->balance->needs + $user->balance->wants + $user->balance->saves;
 
-// $totalExpenses = $user->balance->needs + $user->balance->wants;
-
-// $totalBalance = $totalIncome - $totalExpenses;
-
 
     
         return view('Userdashboard.dashboard', compact('categories', 'transactions', 'totalIncome', 'totalExpenses', 'proId', 'bala','needs','wants'));
     }
 
 
-//     public function stat()
-// {
-
-   
-
-//     $user = Auth::id();
-//     $proId = session('profile_id');
-
-//     $profiles = Profile::where('user_id', $user)->get();
-
-//     $expensesData = [];
-//     $incomesData = [];
-
-//     foreach ($profiles as $profile) {
-
-//         $expensesData[$profile->name] = Transaction::where('profile_id', $profile->id)
-//             ->where('type', 'expense')
-//             ->sum('amount');
-
-//         $incomesData[$profile->name] = Transaction::where('profile_id', $profile->id)
-//             ->where('type', 'revenue')
-//             ->sum('amount');
-
-       
-
-//     }
-
-//     return view('Userdashboard.stats', [
-//         'profiles' => $profiles,
-//         'expensesData' => $expensesData,
-//         'incomesData' => $incomesData,
-//         'proId' => $proId,
-//     ]);
-// }
 
 
 
@@ -199,91 +161,9 @@ public function  returnCategories(int $type)
         return redirect()->route('dashboard')->with('success', 'Category deleted successfully!');
     }
 
-    // // Store a new expense
-    // public function storeTransaction(Request $request)
-    // {
-
-        
-    //     $profileId = session('profile_id');
-    //     // Validate the request
-    //     $validated = $request->validate([
-    // 'title' => 'nullable|string|max:255',
-    // 'amount' => 'required|numeric|min:0',
-    // 'type' => 'required|in:needs,wants,saves,income',
-    // 'categorie_id' => 'required|exists:categories,id', 
-    //  ]);
-
+   
     
-    //     // Get the authenticated user
-    //     $user = Auth::user();
-    
-    //     if (!$user) {
-            
-    //         return redirect('dashboard/'.$profileId)->withErrors(['user' => 'User not found.']);
-    //     }
-    
-       
-       
-    //     switch ($validated['type']) {
-    //         case 'needs':
-    //             // Subtract from needs
-    //             $needsAmount = $validated['amount'];
-    //             if ($user->needs < $needsAmount) {
-    //                 return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient needs balance.']);
-    //             }
-    //             $user->needs -= $needsAmount;
-    //             break;
-        
-    //         case 'wants':
-    //             // Subtract from wants
-    //             $wantsAmount = $validated['amount'];
-    //             if ($user->wants < $wantsAmount) {
-    //                 return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient wants balance.']);
-    //             }
-    //             $user->wants -= $wantsAmount;
-    //             break;
-        
-    //         case 'saves':
-    //             // Subtract from savings
-    //             $savesAmount = $validated['amount'];
-    //             if ($user->saves < $savesAmount) {
-    //                 return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient savings balance.']);
-    //             }
-    //             $user->saves -= $savesAmount;
-    //             break;
-        
-    //         case 'income':
-    //             // Add to all categories based on the specified percentages
-    //             $needsAmount = $validated['amount'] * 0.50;
-    //             $wantsAmount = $validated['amount'] * 0.30;
-    //             $savesAmount = $validated['amount'] * 0.20;
-        
-    //             $user->needs += $needsAmount;
-    //             $user->wants += $wantsAmount;
-    //             $user->saves += $savesAmount;
-    //             break;
-    //     }
-        
-    //     $user->save();
-        
-    
-    //     $user->save();
-    
-    //     $profileId = session('profile_id');
-    
-       
-    //     // Create the transaction
-    //     Transaction::create([
-    //         'title' => $validated['title'],
-    //         'amount' => $validated['amount'],
-    //         'profile_id' => $profileId,
-    //         'type' => $validated['type'],
-
-    //     ]);
-        
-    
-    //     return redirect('dashboard/'.$profileId)->with('success', 'Transaction added successfully!');
-    // }
+   
 
     public function storeTransaction(Request $request)
 {
@@ -291,7 +171,7 @@ public function  returnCategories(int $type)
    
     $profileId = session('profile_id');
 
-    // Validate the request
+   
      $validated = $request->validate([
         'title' => 'nullable|string|max:255',
         'amount' => 'required|numeric|min:0',
@@ -299,9 +179,7 @@ public function  returnCategories(int $type)
         'categorie_id' => '',
     ]);
 
-    // return $validated;
-
-    // Get the authenticated user
+  
     $user = Auth::user();
 
     if (!$user) {
@@ -375,9 +253,8 @@ public function  returnCategories(int $type)
     $userId = Auth::id();
     $proId = session('profile_id');
     
-    // Get all profiles that belong to this user with transaction count
     $profiles = Profile::where('user_id', $userId)
-        ->withCount('transactions') // Assuming the Profile model has a `transactions` relation
+        ->withCount('transactions') 
         ->where('archive' ,1)
         ->get();
   
@@ -394,10 +271,10 @@ public function activate($id)
     $profile = Profile::findOrFail($id);
 
     $profile->update([
-        'active' => 0, // Deactivate the profile
+        'active' => 0, 
     ]);
 
-    return redirect()->route('profiles.manage'); // Redirect back to the manage page
+    return redirect()->route('profiles.manage');
 }
 
 public function deactivate($id)
@@ -408,7 +285,7 @@ public function deactivate($id)
         'active' => 1, // Activate the profile
     ]);
 
-    return redirect()->route('profiles.manage'); // Redirect back to the manage page
+    return redirect()->route('profiles.manage');
 }
 
 public function archive($id)
@@ -419,7 +296,7 @@ public function archive($id)
         'archive' => 0, // Archive the profile
     ]);
 
-    return redirect()->route('profiles.manage'); // Redirect back to the manage page
+    return redirect()->route('profiles.manage'); 
 }
 
 
@@ -428,7 +305,7 @@ public function archive($id)
 public function edit($id)
 {
     $transaction = Transaction::findOrFail($id);
-    $categories = Category::all(); // Assuming you want to show all categories
+    $categories = Category::all(); 
     return view('transactions.edit', compact('transaction', 'categories'));
 }
 
@@ -499,9 +376,7 @@ public function submitGoal(Request $request)
     if ($user->balance->savings < $request['amount']) {
 
 
-        // dd( $user->balance->savings)  ;
-        // return $user->balance->saves .'((' . $request['amount'] ;
-
+      
        
 
         return redirect('/goals')->withErrors(['balance' => 'Insufficient savings balance.']);

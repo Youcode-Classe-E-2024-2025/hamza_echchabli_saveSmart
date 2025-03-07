@@ -9,6 +9,6 @@ class TypeSeeder extends Seeder
         Type::create(['title' => 'income']);
         Type::create(['title' => 'needs']);
         Type::create(['title' => 'wants']);
-        Type::create(['title' => 'saves']);
+        Type::create(['title' => 'savings']);
     }
 }
