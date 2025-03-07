@@ -129,6 +129,7 @@ public function register(Request $request)
         ['title' => 'rent', 'type_id' => 2, 'user_id' =>  $user->id], // null means available for all
         ['title' => 'travling', 'type_id' => 3, 'user_id' =>  $user->id],
         ['title' => 'Freelance', 'type_id' => 1, 'user_id' =>  $user->id],
+        ['title' => 'goal', 'type_id' => 4, 'user_id' =>  $user->id],
        
     ];
 

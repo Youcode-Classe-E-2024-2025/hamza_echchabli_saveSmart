@@ -83,6 +83,8 @@ Route::get('/typescategorie/{type}', [DashController::class, 'returnCategories']
     Route::get('/goals', [DashController::class, 'Goals'])->name('goals.Goals');
     Route::post('/goals', [DashController::class, 'store'])->name('goals.store');
 
+    Route::post('/submitGoal', [DashController::class, 'submitGoal'])->name('goals.store');
+
 
 
 

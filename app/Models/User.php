@@ -60,4 +60,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Balance::class, 'user_id');
     }
+
+    public function goals()
+{
+    return $this->hasMany(Goal::class);
+}
 }

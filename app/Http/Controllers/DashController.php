@@ -418,7 +418,13 @@ public function update(Request $request)
 public function Goals()
 {
     $goals = auth()->user()->goals;
-    return view('goals.goalsView', compact('goals'));
+    $U = auth()->user() ;
+    $savings=$U->balance->savings;
+
+    $pid =session('profile_id');
+
+
+    return view('goals.goalsView', compact('goals' , 'savings' , 'pid'));
 }
 
 
@@ -437,9 +443,93 @@ public function store(Request $request)
         'current_amount' => 0,
     ]);
 
-    return redirect()->route('goals.index')->with('success', 'Goal created successfully.');
+    return redirect('/goals');
 }
 
+// public function submitGoal(Request $request)
+// {
+   
+   
+   
+
+    
+//     // return $validated;
+
+//     $user = Auth::user();
+
+    
+
+//     $type = Type::findOrFail($request['type_id']);
+    
+//     $savesAmount = $request['amount'];
+//     if ($user->balance->saves < $savesAmount) {
+//         return redirect('dashboard/'.$profileId)->withErrors(['balance' => 'Insufficient savings balance.']);
+//     }
+//     $user->balance->saves -= $savesAmount;
+    
+//     // Save the updated balance
+//     $user->balance->save();
+    
+
+//     // Create the transaction
+//     Transaction::create([
+//         'title' => $request['title'],
+//         'amount' => $request['amount'],
+//         'profile_id' => $request['profile_id'],
+//         'type_id' => $request['type_id'],
+//         'categorie_id' => $request['categorie_id'],
+//     ]);
+
+    
+
+
+//     return redirect('/goals');
+// }
+
+
+public function submitGoal(Request $request)
+{
+    // Validate the request data
+    // $validated = $request->validate([
+    //     'title' => 'required|string|max:255',
+    //     'amount' => 'required|numeric|min:0',
+    //     'profile_id' => 'required|exists:profiles,id',
+    //     'type_id' => 'required|exists:types,id',
+    //     'categorie_id' => 'required|exists:categories,id',
+    // ]);
+
+    // Get the authenticated user
+    $user = Auth::user();
+
+    // Check if the user has sufficient savings
+    // if ($user->balance->saves < $validated['amount']) {
+
+        // return  $request['amount'];
+        // return redirect('/goals')->withErrors(['balance' => 'Insufficient savings balance.']);
+    // }
+
+    // Deduct the amount from the user's savings
+    $user->balance->savings -= $request['amount'];
+    $user->balance->save();
+
+    // Create the transaction
+    Transaction::create([
+        'title' => $request['title'],
+        'amount' => $request['amount'],
+        'profile_id' => $request['profile_id'],
+        'type_id' => $request['type_id'],
+        'categorie_id' => $request['categorie_id'],
+    ]);
+
+    // Delete the goal (assuming the goal ID is passed in the request)
+    if ($request->has('goal_id')) {
+        $goal = Goal::findOrFail($request->input('goal_id'));
+        $goal->delete();
+    }
+
+    // Redirect with a success message
+    return redirect('/goals')->with('success', 'Goal submitted and transaction created successfully.');
+}
 
 
 
