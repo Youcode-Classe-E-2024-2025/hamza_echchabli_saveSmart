@@ -1,7 +1,53 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto p-4">
+<div class="flex flex-col md:flex-row min-h-screen">
+    <!-- Sidebar - made narrower -->
+    <div class="w-full md:w-52 bg-gray-800 md:min-h-screen md:fixed md:left-0 md:top-0 pt-12 shadow-lg transition-all duration-300 z-10">
+        <div class="px-4 py-3 border-b border-gray-700">
+            <h1 class="text-lg font-bold text-white">Finance Tracker</h1>
+        </div>
+        <nav>
+            <ul class="mt-4">
+                <li class="mb-1">
+                    <a href="/dashboard/{{$pid}}" class="flex items-center px-4 py-2 text-white hover:bg-gray-700 {{ request()->routeIs('dashboard') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+              
+                <li class="mb-1">
+                    <a href="/manage" class="flex items-center px-4 py-2 text-white hover:bg-gray-700 {{ request()->routeIs('profiles.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        Manage Profiles
+                    </a>
+                </li>
+                <li class="mb-1">
+                    <a href="/stat" class="flex items-center px-4 py-2 text-white hover:bg-gray-700 {{ request()->routeIs('profiles.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        statics
+                    </a>
+                </li>
+
+                <li class="mb-1">
+                    <a href="/goals" class="flex items-center px-4 py-2 text-white hover:bg-gray-700 {{ request()->routeIs('profiles.*') ? 'bg-gray-700 border-l-4 border-blue-500' : '' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        goals
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+<div class="container mx-auto ml-40 p-4">
     <h1 class="text-2xl font-bold mb-6">Financial Goals</h1>
 
     <!-- Success Message -->
@@ -32,7 +78,7 @@
     <!-- Goal Creation Form -->
     <div class="bg-white text-black p-4 rounded-lg shadow-md mb-6">
         <h2 class="text-xl font-semibold mb-4">Create New Goal</h2>
-        <form action="{{ route('goals.store') }}" method="POST">
+        <form action="/goals" method="POST">
             @csrf
             <div class="mb-4">
                 <label for="title" class="block text-sm text-black font-medium text-gray-700">Goal Title</label>
@@ -96,6 +142,10 @@
                             ${{ number_format($goal->target_amount - $goal->current_amount, 2) }} more needed
                         @endif
                     </span>
+
+                    <div class="flex justify-between w-1/4">
+
+                    <a href="/deleteGoal/{{ $goal->id}}" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded" > Delete Goal </a>
                     
                     <form action="/submitGoal" method="POST">
                         @csrf
@@ -112,8 +162,8 @@
                             Allocate Funds
                         </button>
                     </form>
+                      </div>
 
-                    
                 </div>
             </div>
         @endforeach
