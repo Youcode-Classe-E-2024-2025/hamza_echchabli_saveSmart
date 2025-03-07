@@ -51,13 +51,13 @@
             <div class="bg-white rounded-lg shadow-md p-4 mb-4">
                 <h1 class="text-xl font-bold mb-3 text-gray-800">Financial Dashboard</h1>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div class="bg-blue-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
+                    {{-- <div class="bg-blue-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
                         <h3 class="text-base font-medium text-gray-700">Total Balance</h3>
                         <p class="text-2xl font-bold {{ $totalBalance >= 0 ? 'text-green-600' : 'text-red-600' }}">
                             ${{ number_format(abs($totalBalance), 2) }}
                             <span class="text-xs font-normal">{{ $totalBalance >= 0 ? 'positive' : 'negative' }}</span>
                         </p>
-                    </div>
+                    </div> --}}
                     <div class="bg-green-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
                         <h3 class="text-base font-medium text-gray-700">Total Income</h3>
                         <p class="text-2xl font-bold text-green-600">${{ number_format($totalIncome, 2) }}</p>
@@ -66,19 +66,22 @@
                         <h3 class="text-base font-medium text-gray-700">Total Expenses</h3>
                         <p class="text-2xl font-bold text-red-600">${{ number_format($totalExpenses, 2) }}</p>
                     </div>
-                    <div class="bg-red-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <div class="bg-purple-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
                         <h3 class="text-base font-medium text-gray-700">Monthly Income</h3>
                         <p class="text-2xl font-bold text-black">${{ number_format($bala, 2) }}</p>
                     </div>
-                    <div class="bg-red-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
+                    
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 mt-6 gap-3">
+                <div class="bg-blue-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
                         <h3 class="text-base font-medium text-gray-700">Needs Amount</h3>
                         <p class="text-2xl font-bold text-black">${{ number_format($needs, 2) }}</p>
                     </div>
-                    <div class="bg-red-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <div class="bg-yellow-50 rounded-lg p-3 text-center shadow-sm hover:shadow-md transition-shadow duration-200">
                         <h3 class="text-base font-medium text-gray-700">Wants Amount</h3>
                         <p class="text-2xl font-bold text-black">${{ number_format($wants, 2) }}</p>
                     </div>
-                </div>
+                </div> 
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -173,7 +176,7 @@
                             <form action="/dashboard/Transaction" method="POST">
                                 @csrf
                                 <div class="mb-3">
-                                    <label for="expense_title" class="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
+                                    <label for="expense_title" class="block text-sm font-medium text-gray-700 mb-1">title</label>
                                     <input type="text" name="title" id="expense_title" class="w-full px-3 py-1.5 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-300 transition duration-200">
                                 </div>
                                 

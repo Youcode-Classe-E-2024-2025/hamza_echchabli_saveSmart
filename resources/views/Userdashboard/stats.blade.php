@@ -46,27 +46,40 @@
     </div>
 
     <!-- Main content area -->
-    <div class="bg-white w-11/12 h-fit-content md:w-7/10 rounded-lg md:ml-52 p-6  mx-auto">
-        <div class="bg-blue-100 flex-grow md:w-7/10 rounded-lg  ">
+    <div class="bg-blue-50 flex-grow md:w-7/10 ml-40 rounded-lg">
         <h1 class="my-4 text-black text-2xl font-bold">Expenses and Incomes by Profile</h1>
-        <div class="flex justify-evenly">
-            <div class="w-full md:w-1/3">
-                <h3 class="text-center text-black">Expenses</h3>
-                <canvas id="expensesChart"></canvas>
+        <div class="flex flex-wrap justify-evenly">
+            <!-- Income Chart -->
+            <div class="w-full md:w-1/3 p-2">
+                <h3 class="text-center text-black">Income</h3>
+                <canvas id="incomeChart"></canvas>
             </div>
-            <div class="w-full md:w-1/3">
-                <h3 class="text-center text-black">Incomes</h3>
-                <canvas id="incomesChart"></canvas>
-            </div> 
+    
+            <!-- Needs Chart -->
+            <div class="w-full md:w-1/3 p-2">
+                <h3 class="text-center text-black">Needs</h3>
+                <canvas id="needsChart"></canvas>
+            </div>
+    
+            <!-- Wants Chart -->
+            <div class="w-full md:w-1/3 p-2">
+                <h3 class="text-center text-black">Wants</h3>
+                <canvas id="wantsChart"></canvas>
+            </div>
+    
+            <!-- Savings Chart -->
+            <div class="w-full md:w-1/3 p-2">
+                <h3 class="text-center text-black">Savings</h3>
+                <canvas id="savingsChart"></canvas>
+            </div>
         </div>
-
     </div>
 
     </div>
     
     
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
+{{-- <script>
   document.addEventListener('DOMContentLoaded', function () {
     const profiles = @json($profiles->pluck('name'));
     const expensesData = @json(array_values($expensesData));
@@ -149,5 +162,150 @@
    
 });
 
+</script> --}}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const profiles = @json($profiles->pluck('name'));
+    const incomeData = @json(array_values($incomeData));
+    const needsData = @json(array_values($needsData));
+    const wantsData = @json(array_values($wantsData));
+    const savingsData = @json(array_values($savingsData));
+
+    const generateColors = (count) => {
+        const colors = [];
+        for (let i = 0; i < count; i++) {
+            colors.push(`rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`);
+        }
+        return colors;
+    };
+
+    const profileColors = generateColors(profiles.length);
+
+    // Income Chart
+    const incomeCtx = document.getElementById('incomeChart').getContext('2d');
+    new Chart(incomeCtx, {
+        type: 'doughnut',
+        data: {
+            labels: profiles,
+            datasets: [{
+                label: 'Income',
+                data: incomeData,
+                backgroundColor: profileColors,
+                borderColor: profileColors.map(color => color.replace('0.6', '1')),
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.label}: $${context.raw}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Needs Chart
+    const needsCtx = document.getElementById('needsChart').getContext('2d');
+    new Chart(needsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: profiles,
+            datasets: [{
+                label: 'Needs',
+                data: needsData,
+                backgroundColor: profileColors,
+                borderColor: profileColors.map(color => color.replace('0.6', '1')),
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.label}: $${context.raw}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Wants Chart
+    const wantsCtx = document.getElementById('wantsChart').getContext('2d');
+    new Chart(wantsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: profiles,
+            datasets: [{
+                label: 'Wants',
+                data: wantsData,
+                backgroundColor: profileColors,
+                borderColor: profileColors.map(color => color.replace('0.6', '1')),
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.label}: $${context.raw}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Savings Chart
+    const savingsCtx = document.getElementById('savingsChart').getContext('2d');
+    new Chart(savingsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: profiles,
+            datasets: [{
+                label: 'Savings',
+                data: savingsData,
+                backgroundColor: profileColors,
+                borderColor: profileColors.map(color => color.replace('0.6', '1')),
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.label}: $${context.raw}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
 </script>
 @endsection

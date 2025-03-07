@@ -63,47 +63,88 @@ $totalIncome = $user->balance->needs + $user->balance->wants + $user->balance->s
 
 // $totalExpenses = $user->balance->needs + $user->balance->wants;
 
-$totalBalance = $totalIncome - $totalExpenses;
+// $totalBalance = $totalIncome - $totalExpenses;
 
 
     
-        return view('Userdashboard.dashboard', compact('categories', 'transactions', 'totalBalance', 'totalIncome', 'totalExpenses', 'proId', 'bala','needs','wants'));
+        return view('Userdashboard.dashboard', compact('categories', 'transactions', 'totalIncome', 'totalExpenses', 'proId', 'bala','needs','wants'));
     }
 
 
-    public function stat()
-{
+//     public function stat()
+// {
 
    
 
-    $user = Auth::id();
-    $proId = session('profile_id');
+//     $user = Auth::id();
+//     $proId = session('profile_id');
 
-    $profiles = Profile::where('user_id', $user)->get();
+//     $profiles = Profile::where('user_id', $user)->get();
 
-    $expensesData = [];
-    $incomesData = [];
+//     $expensesData = [];
+//     $incomesData = [];
 
-    foreach ($profiles as $profile) {
+//     foreach ($profiles as $profile) {
 
-        $expensesData[$profile->name] = Transaction::where('profile_id', $profile->id)
-            ->where('type', 'expense')
-            ->sum('amount');
+//         $expensesData[$profile->name] = Transaction::where('profile_id', $profile->id)
+//             ->where('type', 'expense')
+//             ->sum('amount');
 
-        $incomesData[$profile->name] = Transaction::where('profile_id', $profile->id)
-            ->where('type', 'revenue')
-            ->sum('amount');
+//         $incomesData[$profile->name] = Transaction::where('profile_id', $profile->id)
+//             ->where('type', 'revenue')
+//             ->sum('amount');
 
        
 
+//     }
+
+//     return view('Userdashboard.stats', [
+//         'profiles' => $profiles,
+//         'expensesData' => $expensesData,
+//         'incomesData' => $incomesData,
+//         'proId' => $proId,
+//     ]);
+// }
+
+
+
+public function stat()
+{
+    $user = Auth::id();
+    $proId = session('profile_id');
+
+    // Get all profiles for the authenticated user
+    $profiles = Profile::where('user_id', $user)->get();
+
+    // Initialize arrays to store stats
+    $incomeData = [];
+    $needsData = [];
+    $wantsData = [];
+    $savingsData = [];
+
+    foreach ($profiles as $profile) {
+        // Calculate total income for the profile
+        $incomeData[$profile->name] = Transaction::where('profile_id', $profile->id)
+            ->where('type_id', 1) // 1 = income
+            ->sum('amount');
+
+        // Calculate total needs for the profile
+        $needsData[$profile->name] = Transaction::where('profile_id', $profile->id)
+            ->where('type_id', 2) // 2 = needs
+            ->sum('amount');
+
+        // Calculate total wants for the profile
+        $wantsData[$profile->name] = Transaction::where('profile_id', $profile->id)
+            ->where('type_id', 3) // 3 = wants
+            ->sum('amount');
+
+        // Calculate total savings for the profile
+        $savingsData[$profile->name] = Transaction::where('profile_id', $profile->id)
+            ->where('type_id', 4) // 4 = savings
+            ->sum('amount');
     }
 
-    return view('Userdashboard.stats', [
-        'profiles' => $profiles,
-        'expensesData' => $expensesData,
-        'incomesData' => $incomesData,
-        'proId' => $proId,
-    ]);
+    return view('Userdashboard.stats', compact('profiles', 'incomeData', 'needsData', 'wantsData', 'savingsData', 'proId'));
 }
 
 
@@ -423,8 +464,11 @@ public function Goals()
 
     $pid =session('profile_id');
 
+    $catg = auth()->user()->categories()->where('type_id' , 4)->get();
+    
+    // return $catg;
 
-    return view('goals.goalsView', compact('goals' , 'savings' , 'pid'));
+    return view('goals.goalsView', compact('goals' , 'savings' , 'pid', 'catg'));
 }
 
 
@@ -452,16 +496,20 @@ public function submitGoal(Request $request)
     
     $user = Auth::user();
 
-    if ($user->balance->saves < $request['amount']) {
+    if ($user->balance->savings < $request['amount']) {
 
-        $user->balance->savings -= $request['amount'];
-        $user->balance->save();
+
+        // dd( $user->balance->savings)  ;
+        // return $user->balance->saves .'((' . $request['amount'] ;
+
+       
 
         return redirect('/goals')->withErrors(['balance' => 'Insufficient savings balance.']);
         
     }
 
-   
+        $user->balance->savings -= $request['amount'];
+        $user->balance->save();
 
     Transaction::create([
         'title' => $request['title'],
@@ -475,6 +523,31 @@ public function submitGoal(Request $request)
         $goal = Goal::findOrFail($request->input('goal_id'));
         $goal->delete();
     }
+
+    
+    return redirect('/goals')->with(['balance'=>'Goal submitted and transaction created successfully.']);
+}
+
+
+
+public function addSaving(Request $request)
+{
+    
+    $user = Auth::user();
+
+    $proId = session('profile_id');
+        $user->balance->savings += $request['amount'];
+        $user->balance->save();
+
+    Transaction::create([
+        'title' => $request['title'],
+        'amount' => $request['amount'],
+        'profile_id' => $proId,
+        'type_id' => $request['type_id'],
+        'categorie_id' => $request['categorie_id'],
+    ]);
+
+   
 
     
     return redirect('/goals')->withErrors('balance', 'Goal submitted and transaction created successfully.');

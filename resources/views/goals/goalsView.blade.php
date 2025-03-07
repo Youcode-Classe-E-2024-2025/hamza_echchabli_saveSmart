@@ -72,11 +72,19 @@
 </div>
 @endif
 
+@if (session('balance'))
+    <div class="text-green-800">
+        {{ session('balance') }}
+    </div>
+@endif
+
         </h3>
     </div>
     
     <!-- Goal Creation Form -->
-    <div class="bg-white text-black p-4 rounded-lg shadow-md mb-6">
+    <div class="flex bg-white text-black p-4 rounded-lg shadow-md mb-6">
+
+        <div class="w-1/2 pr-4">
         <h2 class="text-xl font-semibold mb-4">Create New Goal</h2>
         <form action="/goals" method="POST">
             @csrf
@@ -96,6 +104,50 @@
             </div>
             <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md">Create Goal</button>
         </form>
+        </div>
+        <div class="w-1/2 ">
+
+
+
+
+            <form action="/addSaving" method="POST">
+                @csrf
+                <div class="mb-3">
+                    <label for="expense_title" class="block text-sm font-medium text-gray-700 mb-1">title</label>
+                    <input type="text" name="title" id="expense_title" class="w-full px-3 py-1.5 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-300 transition duration-200">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                    <input type="number" step="0.01" name="amount" id="amount" class="w-full px-3 py-1.5 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-300 transition duration-200" required>
+                </div>
+    
+                <input name="type_id" value="4" id="type" hidden required>
+                      
+               <select name="categorie_id" id="categorieDropDpwn" class="w-full px-3 py-1.5 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-300 transition duration-200" required>
+                    <option value="">Select a category</option>
+                    @foreach($catg as $category)
+                    <option value="{{ $category->id }}">{{ $category->title }}</option>
+                    @endforeach
+                      
+                
+                      
+                    </select>
+               
+    
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-1.5 mt-5 px-4 rounded-md transition duration-200 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add Transaction
+                </button>
+            </form>
+
+
+
+
+
+        </div>    
     </div>
 
     <!-- Existing Goals List -->
